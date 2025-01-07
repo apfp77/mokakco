@@ -44,3 +44,6 @@ bin/
 
 ### environment ###
 .env
+
+### logs ###
+logs/
