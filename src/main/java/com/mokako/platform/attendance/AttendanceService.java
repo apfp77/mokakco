@@ -34,44 +34,72 @@ public class AttendanceService {
      */
     public void exit(Long userId) {
         List<Attendance> attendance = attendanceRepository.findByUserIdAndExitTimeIsNull(userId);
-        if (attendance.isEmpty()){
-            throw new AttendanceException(AttendanceException.Reason.NO_PENDING_EXIT, userId.toString());
-        }
-        int singlePendingExitNode = 1;
-        if (attendance.size() > singlePendingExitNode){
-            throw new AttendanceException(AttendanceException.Reason.MULTIPLE_PENDING_EXIT, userId.toString());
-        }
+        validatePendingAttendance(attendance, userId);
 
         Attendance currentAttendance = attendance.getFirst();
         LocalDateTime exitTime = LocalDateTime.now();
-        System.out.println("currentAttendance.getEntryTime() : " + currentAttendance.getEntryTime());
-        LocalDateTime exitEndTime = currentAttendance.getEntryTime()
-                                                                    .withHour(23)
-                                                                    .withMinute(59)
-                                                                    .withSecond(59);
+        LocalDateTime exitEndTime = getExitEndTime(currentAttendance.getEntryTime());
+
         if (exitTime.isAfter(exitEndTime)){
-            currentAttendance.lastRecordedExit();
-            attendanceRepository.save(currentAttendance);
-            exitEndTime = exitEndTime.plusDays(1);
-            List<Attendance> AttendanceFactory = new ArrayList<>();
-            while(exitTime.isAfter(exitEndTime)){
-                Attendance nextDayAttendance = new Attendance(userId, exitEndTime.withHour(0).withMinute(0).withSecond(0));
-                nextDayAttendance.lastRecordedExit();
-                nextDayAttendance.calculateDuration();
-                AttendanceFactory.add(nextDayAttendance);
-                // attendanceRepository.save(currentAttendance);
-                exitEndTime = exitEndTime.plusDays(1);
-            }
-            Attendance nextDayAttendance = new Attendance(userId, exitEndTime.withHour(0).withMinute(0).withSecond(0));
-            nextDayAttendance.exit();
-            nextDayAttendance.calculateDuration();
-            AttendanceFactory.add(nextDayAttendance);
-            // attendanceRepository.save(nextDayAttendance);
-            attendanceRepository.saveAll(AttendanceFactory);
+            handleCrossDayExit(userId, currentAttendance, exitTime, exitEndTime);
         } else {
-            currentAttendance.exit();
-            attendanceRepository.save(currentAttendance);
+            recordExitTime(currentAttendance);
         }
+    }
+
+    /**
+     * 사용자의 출퇴근 기록을 검증
+     * 하나의 출근 기록만 존재해야 한다.
+     */
+    private void validatePendingAttendance(List<Attendance> attendance, Long userId) {
+        if (attendance.isEmpty()) {
+            throw new AttendanceException(AttendanceException.Reason.NO_PENDING_EXIT, userId.toString());
+        }
+        if (attendance.size() > 1) {
+            throw new AttendanceException(AttendanceException.Reason.MULTIPLE_PENDING_EXIT, userId.toString());
+        }
+    }
+
+    private LocalDateTime getExitEndTime(LocalDateTime entryTime) {
+        return entryTime.withHour(23).withMinute(59).withSecond(59);
+    }
+
+
+    private void handleCrossDayExit(Long userId, Attendance currentAttendance, LocalDateTime exitTime, LocalDateTime exitEndTime) {
+        List<Attendance> newAttendances = new ArrayList<>();
+
+        recordFinalExitTime(currentAttendance);
+
+        while (exitTime.isAfter(exitEndTime)) {
+            Attendance nextDayAttendance = createNextDayAttendance(userId, exitEndTime);
+            newAttendances.add(nextDayAttendance);
+            exitEndTime = exitEndTime.plusDays(1);
+        }
+
+        Attendance finalAttendance = createNextDayAttendance(userId, exitEndTime);
+        finalAttendance.exit();
+        newAttendances.add(finalAttendance);
+
+        attendanceRepository.saveAll(newAttendances);
+    }
+
+
+    private void recordExitTime(Attendance attendance) {
+        attendance.exit();
+        attendanceRepository.save(attendance);
+    }
+
+    private void recordFinalExitTime(Attendance attendance) {
+        attendance.lastRecordedExit();
+        attendanceRepository.save(attendance);
+    }
+
+
+    private Attendance createNextDayAttendance(Long userId, LocalDateTime exitEndTime) {
+        Attendance nextDayAttendance = new Attendance(userId, exitEndTime.withHour(0).withMinute(0).withSecond(0));
+        nextDayAttendance.lastRecordedExit();
+        nextDayAttendance.calculateDuration();
+        return nextDayAttendance;
     }
 
     /**
@@ -79,5 +107,19 @@ public class AttendanceService {
      */
     public boolean findTodayAttendance(Long userId) {
         return attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)).size() == 1;
+    }
+
+    /**
+     * 당일 출근시간 조회
+     */
+    public Integer findTodayAttendanceTime(Long userId) {
+        List<Attendance> attendance = attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
+
+        Integer sum = 0;
+        for (Attendance a : attendance) {
+            sum += a.getDurationMinutes();
+        }
+
+        return sum;
     }
 }
