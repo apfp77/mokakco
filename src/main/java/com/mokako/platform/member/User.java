@@ -1,13 +1,9 @@
 package com.mokako.platform.member;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-
-import java.math.BigInteger;
 
 @Entity
 @NoArgsConstructor
@@ -20,7 +16,7 @@ public class User {
     private Long id;
 
     @Column(precision = 19, scale = 0, nullable = false) // 19자리 정수, 소수점 없음
-    private long discord_id;
+    private long discordId;
 
     // 서버 프로필 이름
     @Column(nullable = false)
@@ -30,8 +26,8 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    protected User(long discord_id, String effectiveName, String name) {
-        this.discord_id = discord_id;
+    protected User(long discordId, String effectiveName, String name) {
+        this.discordId = discordId;
         this.effectiveName = effectiveName;
         this.name = name;
     }
