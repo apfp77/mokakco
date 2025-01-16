@@ -23,6 +23,14 @@
         </encoder>
     </appender>
 
+    <!-- 에러 로그 파일 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/error.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- 일반 로거 -->
     <logger name="generalLogger" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE" />
@@ -35,9 +43,15 @@
         <appender-ref ref="CONSOLE" />      <!-- 콘솔에 출력 -->
     </logger>
 
+    <!-- 에러 로거 -->
+    <logger name="errorLogger" level="ERROR" additivity="false">
+        <appender-ref ref="ERROR_FILE" /> <!-- 파일에 저장 -->
+        <appender-ref ref="CONSOLE" />      <!-- 콘솔에 출력 -->
+    </logger>
 
     <!-- 루트 로거 -->
     <root level="INFO">
+        <appender-ref ref="CONSOLE" />
         <appender-ref ref="GENERAL_FILE" />
     </root>
 </configuration>
