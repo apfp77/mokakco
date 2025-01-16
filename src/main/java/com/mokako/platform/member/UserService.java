@@ -28,12 +28,18 @@ public class UserService {
 
     public void registerNewMembers(List<Member> members) {
         List<User> dbUsers = userRepository.findAll();
-        Set<Long> dbUserIds = dbUsers.stream().map(User::getDiscord_id).collect(Collectors.toSet());
+        Set<Long> dbUserIds = dbUsers.stream().map(User::getDiscordId).collect(Collectors.toSet());
 
         for (Member member : members) {
             if (!dbUserIds.contains(member.getIdLong())) {
                 registerUser(member);
             }
         }
+    }
+
+    public Long findUserIdByDiscordId(Long discordId) throws IllegalArgumentException{
+        return userRepository.findByDiscordId(discordId)
+                .orElseThrow(() -> new UserException(UserException.Reason.ID_NOT_FOUND, discordId.toString()))
+                .getId();
     }
 }
