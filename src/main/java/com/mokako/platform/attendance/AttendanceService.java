@@ -2,6 +2,7 @@ package com.mokako.platform.attendance;
 
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +118,10 @@ public class AttendanceService {
 
         Integer sum = 0;
         for (Attendance a : attendance) {
+            if (a.getDurationMinutes() == null){
+                sum += (int) Duration.between(a.getEntryTime(), LocalDateTime.now()).toMinutes();
+                continue;
+            }
             sum += a.getDurationMinutes();
         }
 
