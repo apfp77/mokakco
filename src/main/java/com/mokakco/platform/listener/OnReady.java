@@ -1,6 +1,6 @@
-package com.mokako.platform.listener;
+package com.mokakco.platform.listener;
 
-import com.mokako.platform.member.UserService;
+import com.mokakco.platform.member.UserService;
 import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

@@ -1,7 +1,7 @@
-package com.mokako.platform.listener;
+package com.mokakco.platform.listener;
 
-import com.mokako.platform.attendance.AttendanceService;
-import com.mokako.platform.member.UserService;
+import com.mokakco.platform.attendance.AttendanceService;
+import com.mokakco.platform.member.UserService;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

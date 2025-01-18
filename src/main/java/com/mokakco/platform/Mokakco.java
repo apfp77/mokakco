@@ -1,4 +1,4 @@
-package com.mokako.platform;
+package com.mokakco.platform;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.boot.SpringApplication;

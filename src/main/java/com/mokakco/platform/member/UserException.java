@@ -1,4 +1,4 @@
-package com.mokako.platform.member;
+package com.mokakco.platform.member;
 
 import lombok.Getter;
 import org.slf4j.Logger;

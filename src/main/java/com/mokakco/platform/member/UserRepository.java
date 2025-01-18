@@ -1,4 +1,4 @@
-package com.mokako.platform.member;
+package com.mokakco.platform.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

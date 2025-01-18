@@ -1,4 +1,4 @@
-package com.mokako.platform.attendance;
+package com.mokakco.platform.attendance;
 
 import org.springframework.stereotype.Service;
 

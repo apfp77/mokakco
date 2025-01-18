@@ -1,8 +1,8 @@
-package com.mokako.platform.configure;
+package com.mokakco.platform.configure;
 
-import com.mokako.platform.listener.CommandListener;
-import com.mokako.platform.listener.GuildVoiceUpdate;
-import com.mokako.platform.listener.OnReady;
+import com.mokakco.platform.listener.CommandListener;
+import com.mokakco.platform.listener.GuildVoiceUpdate;
+import com.mokakco.platform.listener.OnReady;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.JDA;

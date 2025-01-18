@@ -1,4 +1,4 @@
-package com.mokako.platform.attendance;
+package com.mokakco.platform.attendance;
 
 import lombok.Getter;
 import org.slf4j.Logger;
