@@ -5,7 +5,7 @@ plugins {
     id 'application'
 }
 
-group = 'org.example'
+group = 'com.mokakco.platform'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -27,7 +27,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'org.example.DiscordBot'
+    mainClass = 'com.mokakco.platform.Mokakco'
 }
 
 test {
