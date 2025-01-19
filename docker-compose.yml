@@ -1,30 +1,40 @@
 version: "3.8"
 services:
-  app:
-    build:
-      context: .
-    container_name: spring-boot-app
-    ports:
-      - "${SPRING_APP_PORT}:${SPRING_APP_PORT}" # Spring Boot 포트를 환경 변수로 관리
-    depends_on:
-      - db
-    environment:
-      SPRING_APP_PORT: ${SPRING_APP_PORT}
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+
 
   db:
     image: mysql:8.0
     container_name: mysql-db
     ports:
-      - "${MYSQL_PORT}:3306" # MySQL 포트를 환경 변수로 관리
+      - "${MYSQL_EXTERNAL_PORT}:${MYSQL_INTERNAL_PORT}" # MySQL 포트를 환경 변수로 관리
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u${DB_USERNAME} -p${DB_PASSWORD} || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  app:
+    build:
+      context: .
+    container_name: spring-boot-app
+    ports:
+      - "${SPRING_APP_PORT}:${SPRING_APP_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
 
 volumes:
   db-data:
 
+networks:
+  app-network:
+    driver: bridge
