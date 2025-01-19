@@ -6,6 +6,7 @@ WORKDIR /app
 
 # JAR 파일 복사
 COPY build/libs/*.jar app.jar
+COPY .env .env
 
 # 앱 실행 명령어
 ENTRYPOINT ["java", "-jar", "app.jar"]
