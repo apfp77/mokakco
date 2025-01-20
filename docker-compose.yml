@@ -8,6 +8,7 @@ services:
     ports:
       - "${MYSQL_EXTERNAL_PORT}:${MYSQL_INTERNAL_PORT}" # MySQL 포트를 환경 변수로 관리
     environment:
+      TZ: "Asia/Seoul"
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
     healthcheck:
@@ -24,6 +25,8 @@ services:
     build:
       context: .
     container_name: spring-boot-app
+    environment:
+      TZ: "Asia/Seoul"
     ports:
       - "${SPRING_APP_PORT}:${SPRING_APP_PORT}"
     depends_on:
