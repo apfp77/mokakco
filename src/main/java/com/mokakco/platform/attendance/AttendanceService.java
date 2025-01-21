@@ -70,6 +70,7 @@ public class AttendanceService {
         List<Attendance> newAttendances = new ArrayList<>();
 
         recordFinalExitTime(currentAttendance);
+        exitEndTime = exitEndTime.plusDays(1);
 
         while (exitTime.isAfter(exitEndTime)) {
             Attendance nextDayAttendance = createNextDayAttendance(userId, exitEndTime);
@@ -105,9 +106,14 @@ public class AttendanceService {
 
     /**
      * 당일의 출근 기록 조회
+     * Attendance 테이블에서 특정 시간대에 데이터가 있는지 확인한다.
+     * @param userId 사용자 식별값
+     * @param entryTime 출근 시간
+     * @param exitTime 퇴근 시간
      */
-    public boolean findTodayAttendance(Long userId) {
-        return attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)).size() == 1;
+    public boolean findTodayAttendance(Long userId, LocalDateTime entryTime, LocalDateTime exitTime) {
+        return attendanceRepository
+                .findByUserIdAndEntryTimeBetween(userId, entryTime, exitTime).size() == 1;
     }
 
     /**
