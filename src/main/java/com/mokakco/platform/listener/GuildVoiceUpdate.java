@@ -45,25 +45,45 @@ public class GuildVoiceUpdate extends ListenerAdapter {
         // 채널 참여
             Long userId = userService.findUserIdByDiscordId(member.getIdLong());
             attendanceService.entry(userId);
-            if (attendanceService.findTodayAttendance(userId)){
-                TextChannel channel = discordConfigure.getAttendanceChannel();
+            TextChannel channel = discordConfigure.getAttendanceChannel();
                 /**
                  * 오전(08시 ~ 12시)반, 오후(1시 ~ 6시)반, 저녁(8시 ~ 12시)반
                  * 각 시간때마다 한 시간 이상이면 출석을 완료했다는 메시지를 보냄
                  * 00시 ~ 08시 사이에는 알람을 보내지 않는다
                  */
-                if (LocalDateTime.now().getHour() >= 8){
-                    String timeState;
-                    if (LocalDateTime.now().getHour() < 12){
-                        timeState = "오전반";
-                    } else if (LocalDateTime.now().getHour() < 18){
-                        timeState = "오후반";
-                    } else {
-                        timeState = "저녁반";
+                // 오전반
+                if (LocalDateTime.now().getHour() >= 8 && LocalDateTime.now().getHour() < 12) {
+                    if (attendanceService.findTodayAttendance(userId,
+                            LocalDateTime.now().withHour(7)
+                                    .withMinute(59)
+                                    .withSecond(59), LocalDateTime.now().withHour(11)
+                                    .withMinute(59)
+                                    .withSecond(59))) {
+                        channel.sendMessage(String.format("%s 님이 오전반에 출석하였습니다", member.getEffectiveName())).queue();
                     }
-                    channel.sendMessage(String.format("%s 님이 %s에 출석하였습니다", member.getEffectiveName(), timeState)).queue();
                 }
-            }
+                // 오후반
+                if (LocalDateTime.now().getHour() >= 13 && LocalDateTime.now().getHour() < 18) {
+                    if (attendanceService.findTodayAttendance(userId,
+                            LocalDateTime.now().withHour(12)
+                                    .withMinute(59)
+                                    .withSecond(59), LocalDateTime.now().withHour(17)
+                                    .withMinute(59)
+                                    .withSecond(59))) {
+                        channel.sendMessage(String.format("%s 님이 오후반에 출석하였습니다", member.getEffectiveName())).queue();
+                    }
+                }
+                // 저녁반
+                if (LocalDateTime.now().getHour() >= 20) {
+                    if (attendanceService.findTodayAttendance(userId,
+                            LocalDateTime.now().withHour(19)
+                                    .withMinute(59)
+                                    .withSecond(59), LocalDateTime.now().withHour(23)
+                                    .withMinute(59)
+                                    .withSecond(59))) {
+                        channel.sendMessage(String.format("%s 님이 저녁반에 출석하였습니다", member.getEffectiveName())).queue();
+                    }
+                }
             botLogger.info("{} + '님이' + {} + '채널에 참여했습니다.'", member.getEffectiveName(), joinedChannel.getName());
         } else if (leftChannel != null) {
         // 채널 나감

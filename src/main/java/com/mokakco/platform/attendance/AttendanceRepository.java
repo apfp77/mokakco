@@ -9,4 +9,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByUserIdAndExitTimeIsNull(Long userId);
 
     List<Attendance> findByUserIdAndEntryTimeAfter(Long userId, LocalDateTime entryTimeAfter);
+
+    List<Attendance>  findByUserIdAndEntryTimeBetween(
+            Long userId,
+            LocalDateTime startEntryTime,
+            LocalDateTime endEntryTime
+    );
 }
