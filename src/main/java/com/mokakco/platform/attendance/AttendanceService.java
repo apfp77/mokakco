@@ -80,6 +80,7 @@ public class AttendanceService {
 
         Attendance finalAttendance = createNextDayAttendance(userId, exitEndTime);
         finalAttendance.exit();
+        finalAttendance.calculateDuration();
         newAttendances.add(finalAttendance);
 
         attendanceRepository.saveAll(newAttendances);
