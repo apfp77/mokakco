@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -23,10 +24,6 @@ public class DiscordConfigure extends ListenerAdapter {
 
     @Value("${DISCORD_BOT_TOKEN}")
     private String token;
-
-    @Value("${ATTENDANCE_CHANNEL_ID}")
-    private Long attendanceChannelId;
-
     private JDA jda;
 
     private final GuildVoiceUpdate guildVoiceUpdate;
@@ -59,8 +56,12 @@ public class DiscordConfigure extends ListenerAdapter {
                 .build();
     }
 
-    public TextChannel getAttendanceChannel() {
-        return jda.getTextChannelById(attendanceChannelId);
+    public TextChannel getChannel(Long channelId) {
+        return jda.getTextChannelById(channelId);
+    }
+
+    public Guild getGuild(Long channelId) {
+        return jda.getGuildById(channelId);
     }
 
     // 서버 종료 시 discord 봇 해제

@@ -18,7 +18,7 @@ import java.util.Objects;
 @Service
 public class CommandListener extends ListenerAdapter {
 
-    @Value("${ATTENDANCE_CHANNEL_ID}")
+    @Value("${ATTENDANCE_SEARCH_CHANNEL_ID}")
     private Long attendanceChannelId;
 
     private final AttendanceService attendanceService;

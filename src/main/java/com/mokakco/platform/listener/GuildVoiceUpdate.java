@@ -10,15 +10,23 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class GuildVoiceUpdate extends ListenerAdapter {
 
     private static final Logger botLogger = LoggerFactory.getLogger("discordBotLogger");
+
+    @Value("${ATTENDANCE_NOTIFICATION_CHANNEL_ID}")
+    private Long attendanceNotificationChannelId;
+
+    @Value("${ATTENDANCE_ENTRY_EXIT_CHANNEL_ID}")
+    private Long attendanceEntryExitChannelId;
 
     private final UserService userService;
     private final AttendanceService attendanceService;
@@ -43,9 +51,12 @@ public class GuildVoiceUpdate extends ListenerAdapter {
         }
         if (joinedChannel != null) {
         // 채널 참여
+            if (Objects.requireNonNull(event.getChannelJoined()).getIdLong() != attendanceEntryExitChannelId) {
+                return;
+            }
             Long userId = userService.findUserIdByDiscordId(member.getIdLong());
             attendanceService.entry(userId);
-            TextChannel channel = discordConfigure.getAttendanceChannel();
+            TextChannel channel = discordConfigure.getChannel(attendanceNotificationChannelId);
                 /**
                  * 오전(08시 ~ 12시)반, 오후(1시 ~ 6시)반, 저녁(8시 ~ 12시)반
                  * 각 시간때마다 한 시간 이상이면 출석을 완료했다는 메시지를 보냄
