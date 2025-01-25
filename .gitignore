@@ -44,6 +44,8 @@ bin/
 
 ### environment ###
 .env
+.env.production
+/.env.production
 
 ### logs ###
 logs/
