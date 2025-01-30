@@ -47,12 +47,12 @@ public class Attendance {
         }
     }
 
-    protected void entry(){
-        this.entryTime = LocalDateTime.now();
+    protected void entry(LocalDateTime time){
+        this.entryTime = time;
     }
 
-    protected void exit(){
-        this.exitTime = LocalDateTime.now();
+    protected void exit(LocalDateTime time){
+        this.exitTime = time;
     }
 
     // 하루를 넘어가는 경우 당일 퇴근시간을 23시 59분 59초로 설정
