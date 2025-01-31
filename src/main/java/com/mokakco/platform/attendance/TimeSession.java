@@ -14,20 +14,19 @@ public class TimeSession {
 
     private final Session timeSession;
 
+    @Getter
     private enum Session {
-        MORNING("MORNING"),
-        AFTERNOON("AFTERNOON"),
-        EVENING("EVENING"),
-        DAWN("DAWN");
+        MORNING("MORNING", "오전반"),
+        AFTERNOON("AFTERNOON", "오후반"),
+        EVENING("EVENING", "저녁반"),
+        DAWN("DAWN", "심야반");
 
         private final String value;
+        private final String koreanValue;
 
-        Session(String value) {
+        Session(String value, String koreanValue) {
             this.value = value;
-        }
-
-        public String getValue() {
-            return value;
+            this.koreanValue = koreanValue;
         }
 
         // 문자열을 기반으로 Session 찾기
@@ -47,6 +46,10 @@ public class TimeSession {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * JPA를 위한 기본 생성자
+     * 가급적 사용하지 않는 것을 권장
+     */
     protected TimeSession() {
         this.timeSession = determineSession(LocalDateTime.now().getHour());
     }
@@ -77,8 +80,16 @@ public class TimeSession {
         return new TimeSession(Session.fromString(sessionString));
     }
 
+    public static String findSessionByTime(LocalDateTime time) {
+        return new TimeSession(time).getKoreanSession();
+    }
+
     // 현재 세션 값을 문자열로 반환
     public String getSessionAsString() {
         return timeSession.getValue();
+    }
+
+    public String getKoreanSession() {
+        return timeSession.getKoreanValue();
     }
 }
