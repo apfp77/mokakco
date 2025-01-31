@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -39,7 +40,7 @@ public class DiscordConfigure extends ListenerAdapter {
 
     // 서버 실행 시 discord 봇 연결
     @PostConstruct
-    public void startBot() {
+    public void startBot() throws InterruptedException {
         jda = JDABuilder.createDefault(token)
                 .enableIntents(EnumSet.allOf(GatewayIntent.class))
                 .enableCache(EnumSet.allOf(CacheFlag.class))
@@ -54,10 +55,19 @@ public class DiscordConfigure extends ListenerAdapter {
                 .addEventListeners(onReady)
                 .addEventListeners(commandListener)
                 .build();
+        this.awaitJDA();
     }
 
     public TextChannel getChannel(Long channelId) {
         return jda.getTextChannelById(channelId);
+    }
+
+    public VoiceChannel getVoiceChannel(Long channelId) {
+        return jda.getVoiceChannelById(channelId);
+    }
+
+    private void awaitJDA() throws InterruptedException {
+        jda.awaitReady();
     }
 
     public Guild getGuild(Long channelId) {
