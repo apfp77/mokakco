@@ -1,6 +1,7 @@
 package com.mokakco.platform.attendance;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class AttendanceSessions {
@@ -16,14 +17,13 @@ public class AttendanceSessions {
     @Column(nullable = false)
     private Long userId;
 
-
     @Column
     private Integer stayDurationMinutes;
 
     protected AttendanceSessions() {}
 
-    protected AttendanceSessions(Long userId) {
+    protected AttendanceSessions(Long userId, LocalDateTime entryTime) {
         this.userId = userId;
-        this.timeSession = new TimeSession();
+        this.timeSession = new TimeSession(entryTime);
     }
 }
