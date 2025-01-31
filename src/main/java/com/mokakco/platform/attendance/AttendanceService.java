@@ -2,6 +2,7 @@ package com.mokakco.platform.attendance;
 
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,10 +12,11 @@ import java.util.List;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final Clock clock;
 
-
-    public AttendanceService(AttendanceRepository attendanceRepository) {
+    public AttendanceService(AttendanceRepository attendanceRepository, Clock clock) {
         this.attendanceRepository = attendanceRepository;
+        this.clock = clock;
     }
 
     /**
@@ -24,7 +26,7 @@ public class AttendanceService {
      */
     public void entry(Long userId){
         Attendance attendance = new Attendance(userId);
-        attendance.entry();
+        attendance.entry(LocalDateTime.now(clock));
         attendanceRepository.save(attendance);
     }
 
@@ -38,7 +40,7 @@ public class AttendanceService {
         validatePendingAttendance(attendance, userId);
 
         Attendance currentAttendance = attendance.getFirst();
-        LocalDateTime exitTime = LocalDateTime.now();
+        LocalDateTime exitTime = LocalDateTime.now(clock);
         LocalDateTime exitEndTime = getExitEndTime(currentAttendance.getEntryTime());
 
         if (exitTime.isAfter(exitEndTime)){
@@ -79,7 +81,7 @@ public class AttendanceService {
         }
 
         Attendance finalAttendance = createNextDayAttendance(userId, exitEndTime);
-        finalAttendance.exit();
+        finalAttendance.exit(LocalDateTime.now(clock));
         finalAttendance.calculateDuration();
         newAttendances.add(finalAttendance);
 
@@ -88,7 +90,7 @@ public class AttendanceService {
 
 
     private void recordExitTime(Attendance attendance) {
-        attendance.exit();
+        attendance.exit(LocalDateTime.now(clock));
         attendanceRepository.save(attendance);
     }
 
@@ -121,12 +123,12 @@ public class AttendanceService {
      * 당일 출근시간 조회
      */
     public Integer findTodayAttendanceTime(Long userId) {
-        List<Attendance> attendance = attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
+        List<Attendance> attendance = attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now(clock).withHour(0).withMinute(0).withSecond(0));
 
         Integer sum = 0;
         for (Attendance a : attendance) {
             if (a.getDurationMinutes() == null){
-                sum += (int) Duration.between(a.getEntryTime(), LocalDateTime.now()).toMinutes();
+                sum += (int) Duration.between(a.getEntryTime(), LocalDateTime.now(clock)).toMinutes();
                 continue;
             }
             sum += a.getDurationMinutes();
