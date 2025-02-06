@@ -1,6 +1,8 @@
 package com.mokakco.platform.attendance;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 @Embeddable
 public class TimeSession {
 
+    @Enumerated(EnumType.STRING)
     private final Session timeSession;
 
     @Getter
