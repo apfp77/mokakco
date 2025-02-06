@@ -43,7 +43,11 @@ public class AttendanceService {
 
         Attendance currentAttendance = attendance.getFirst();
         LocalDateTime exitTime = LocalDateTime.now(clock);
-        attendanceSessionsService.recordSession(userId, currentAttendance.getEntryTime(), exitTime);
+        attendanceSessionsService.recordSession(
+                userId,
+                currentAttendance.getEntryTime(),
+                (int) Duration.between(currentAttendance.getEntryTime(), exitTime).toMinutes()
+        );
         LocalDateTime exitEndTime = getExitEndTime(currentAttendance.getEntryTime());
 
         if (exitTime.isAfter(exitEndTime)){
