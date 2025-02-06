@@ -35,6 +35,9 @@ public class AttendanceSessions {
     }
 
     protected void updateStayDurationMinutes(Integer stayDurationMinutes) {
-        this.stayDurationMinutes = stayDurationMinutes;
+        if (this.stayDurationMinutes == null){
+            this.stayDurationMinutes = 0;
+        }
+        this.stayDurationMinutes += stayDurationMinutes;
     }
 }

@@ -35,7 +35,7 @@ public class AttendanceSessionsService {
      // * @return 생성된 AttendanceSessions 엔티티 목록 (하나 이상일 수 있음)
      */
     public void recordSession(Long userId,
-                                                  LocalDateTime exitTime, Integer StayDurationMinutes) {
+                                                  LocalDateTime exitTime, Integer stayDurationMinutes) {
         // 데이터베이스에서 userId와 date가 같은 세션을 조회
         List<AttendanceSessions> sessions =
                 attendanceSessionsRepository.findByUserIdAndDateAndTimeSession(
@@ -50,13 +50,13 @@ public class AttendanceSessionsService {
             AttendanceSessions session = new AttendanceSessions(
                     userId,
                     exitTime,
-                    0,
+                    stayDurationMinutes,
                     exitTime.toLocalDate()
             );
             attendanceSessionsRepository.save(session);
             return;
         }
-        sessions.getFirst().updateStayDurationMinutes(StayDurationMinutes);
+        sessions.getFirst().updateStayDurationMinutes(stayDurationMinutes);
         attendanceSessionsRepository.save(sessions.getFirst());
     }
 
