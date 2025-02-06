@@ -13,10 +13,12 @@ public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final Clock clock;
+    private final AttendanceSessionsService attendanceSessionsService;
 
-    public AttendanceService(AttendanceRepository attendanceRepository, Clock clock) {
+    public AttendanceService(AttendanceRepository attendanceRepository, Clock clock, AttendanceSessionsService attendanceSessionsService) {
         this.attendanceRepository = attendanceRepository;
         this.clock = clock;
+        this.attendanceSessionsService = attendanceSessionsService;
     }
 
     /**
@@ -41,6 +43,7 @@ public class AttendanceService {
 
         Attendance currentAttendance = attendance.getFirst();
         LocalDateTime exitTime = LocalDateTime.now(clock);
+        attendanceSessionsService.recordSession(userId, currentAttendance.getEntryTime(), exitTime);
         LocalDateTime exitEndTime = getExitEndTime(currentAttendance.getEntryTime());
 
         if (exitTime.isAfter(exitEndTime)){
@@ -123,7 +126,7 @@ public class AttendanceService {
      * 당일 출근시간 조회
      */
     public Integer findTodayAttendanceTime(Long userId) {
-        List<Attendance> attendance = attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now(clock).withHour(0).withMinute(0).withSecond(0));
+        List<Attendance> attendance = attendanceRepository.findByUserIdAndEntryTimeAfter(userId, LocalDateTime.now(clock).withHour(0).withMinute(0).withSecond(0).withNano(0));
 
         Integer sum = 0;
         for (Attendance a : attendance) {
