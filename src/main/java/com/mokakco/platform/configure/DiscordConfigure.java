@@ -1,5 +1,6 @@
 package com.mokakco.platform.configure;
 
+import com.mokakco.platform.listener.CommandEnum;
 import com.mokakco.platform.listener.CommandListener;
 import com.mokakco.platform.listener.GuildVoiceUpdate;
 import com.mokakco.platform.listener.OnReady;
@@ -11,6 +12,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -18,7 +21,9 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 @Configuration
 public class DiscordConfigure extends ListenerAdapter {
@@ -54,8 +59,19 @@ public class DiscordConfigure extends ListenerAdapter {
                 .addEventListeners(guildVoiceUpdate)
                 .addEventListeners(onReady)
                 .addEventListeners(commandListener)
-                .build();
-        this.awaitJDA();
+                .build()
+                .awaitReady();
+
+        // Enum을 기반으로 명령어를 자동 등록
+        List<CommandData> commands = new ArrayList<>();
+        for (CommandEnum cmd : CommandEnum.values()) {
+            commands.add(Commands.slash(cmd.getCommand(), cmd.getDescription())
+                    // .setDefaultPermissions(DefaultMemberPermissions.DISABLED) // 관리자 권한 설정 비활성화
+            );
+        }
+
+        // updateCommands()를 사용하여 자동 등록
+        jda.updateCommands().addCommands(commands).queue();
     }
 
     public TextChannel getChannel(Long channelId) {
@@ -64,10 +80,6 @@ public class DiscordConfigure extends ListenerAdapter {
 
     public VoiceChannel getVoiceChannel(Long channelId) {
         return jda.getVoiceChannelById(channelId);
-    }
-
-    private void awaitJDA() throws InterruptedException {
-        jda.awaitReady();
     }
 
     public Guild getGuild(Long channelId) {
