@@ -33,13 +33,12 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ${PWD}:/app/logs
+      - ${PWD}/logs:/app/logs
     networks:
       - app-network
 
 volumes:
   db-data:
-  app-logs:
 
 networks:
   app-network:
