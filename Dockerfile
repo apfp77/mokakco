@@ -8,5 +8,7 @@ WORKDIR /app
 COPY build/libs/*.jar app.jar
 COPY .env .env
 
+RUN mkdir -p /app/logs
+
 # 앱 실행 명령어
 ENTRYPOINT ["java", "-jar", "app.jar"]

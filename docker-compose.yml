@@ -32,11 +32,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - $(pwd):/app/logs
     networks:
       - app-network
 
 volumes:
   db-data:
+  app-logs:
 
 networks:
   app-network:
