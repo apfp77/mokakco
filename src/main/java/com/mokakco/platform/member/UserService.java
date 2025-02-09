@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    // discord 회원 정보를 유저로 등록
-
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -37,7 +35,7 @@ public class UserService {
         }
     }
 
-    public Long findUserIdByDiscordId(Long discordId) throws IllegalArgumentException{
+    public Long findUserIdByDiscordId(Long discordId) throws UserException {
         return userRepository.findByDiscordId(discordId)
                 .orElseThrow(() -> new UserException(UserException.Reason.ID_NOT_FOUND, discordId.toString()))
                 .getId();

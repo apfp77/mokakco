@@ -1,15 +1,12 @@
 package com.mokakco.platform.member;
 
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 public class UserException extends RuntimeException {
 
     private final Reason reason;
     private final String customMessage;
-    private final Logger logger = LoggerFactory.getLogger("errorLogger");
 
     public enum Reason {
         ID_NOT_FOUND("사용자를 찾을 수 없습니다. ID: {0}"),
@@ -37,7 +34,6 @@ public class UserException extends RuntimeException {
         super(reason.formatMessage(args)); // 포맷 메시지로 동적으로 메시지 생성
         this.reason = reason;
         this.customMessage = reason.formatMessage(args);
-        logger.error(customMessage);
     }
 
 }

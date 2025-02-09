@@ -2,8 +2,6 @@ package com.mokakco.platform.attendance;
 
 import com.mokakco.platform.configure.DiscordConfigure;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +18,6 @@ public class AttendanceNotification {
     private final Map<String, Map<Long, Boolean>> notificationSent;
     private final DiscordConfigure discordConfigure;
     private final Clock clock;
-    private final Logger logger = LoggerFactory.getLogger("errorLogger");
 
     public AttendanceNotification(@Lazy DiscordConfigure discordConfigure, Clock clock) {
         this.discordConfigure = discordConfigure;
@@ -54,8 +51,7 @@ public class AttendanceNotification {
         }
         TextChannel channel = discordConfigure.getChannel(channelId);
         if (channel == null) {
-            logger.error("채널을 찾을 수 없습니다.");
-            return;
+            throw new IllegalArgumentException("알림 채널을 찾을 수 없습니다.");
         }
         channel.sendMessage(message).queue();
         notificationSent.get(session.getSessionAsString()).put(userId, true);

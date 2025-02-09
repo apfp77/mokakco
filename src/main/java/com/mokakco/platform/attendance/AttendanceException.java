@@ -1,13 +1,10 @@
 package com.mokakco.platform.attendance;
 
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 public class AttendanceException extends RuntimeException {
 
-    private final Logger logger = LoggerFactory.getLogger("errorLogger");
     private final Reason reason;
     private final String customMessage;
 
@@ -35,7 +32,6 @@ public class AttendanceException extends RuntimeException {
         super(reason.formatMessage(args)); // 포맷 메시지로 동적으로 메시지 생성
         this.reason = reason;
         this.customMessage = reason.formatMessage(args);
-        logger.error(customMessage);
     }
 }
 
