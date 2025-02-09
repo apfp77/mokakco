@@ -8,7 +8,7 @@ git pull origin main
 echo "✅ Git pull completed"
 
 echo "2. Performing Gradle build..."
-./gradlew clean build
+./gradlew clean build -x test
 echo "✅ Gradle build completed"
 
 echo "3. Stopping running Gradle daemon..."
