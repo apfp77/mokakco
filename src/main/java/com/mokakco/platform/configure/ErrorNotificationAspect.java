@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -15,7 +16,7 @@ public class ErrorNotificationAspect {
     private final ErrorNotificationService errorNotificationService;
     private final Logger logger = LoggerFactory.getLogger("errorLogger");
 
-    public ErrorNotificationAspect(ErrorNotificationService errorNotificationService) {
+    public ErrorNotificationAspect(@Lazy ErrorNotificationService errorNotificationService) {
         this.errorNotificationService = errorNotificationService;
     }
 
