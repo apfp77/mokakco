@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum CommandEnum {
-    ATTENDANCE_TIME("출석시간", "금일 출석 기록을 확인합니다.");
+    ATTENDANCE_TIME("출석시간", "금일 출석 기록을 확인합니다."),
+    ATTENDANCE_SESSION_TIME("출석기록", "최근 1주일간의 출석 기록을 확인합니다.");
 
     private final String command;
     private final String description;

@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface AttendanceSessionsRepository extends JpaRepository<AttendanceSessions, Long> {
     List<AttendanceSessions> findByUserIdAndDateAndTimeSession(Long userId, LocalDate date, TimeSession timeSession);
+
+    List<AttendanceSessions> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate dateAfter, LocalDate dateBefore);
+
 }

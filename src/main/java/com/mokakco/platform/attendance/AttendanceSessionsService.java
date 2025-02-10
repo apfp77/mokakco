@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +61,51 @@ public class AttendanceSessionsService {
         sessions.getFirst().updateStayDurationMinutes(stayDurationMinutes);
         attendanceSessionsRepository.save(sessions.getFirst());
     }
+
+    /**
+     * 사용자의 최근 1주일 기록을 반환한다.
+     * 해당하는 record 가 없다면 새로 생성 후 strayDurationMinutes 필드를 0으로 채워서 반환한다.
+     * @param userId 사용자 아이디
+     * @param date 기준날짜
+     * @return 최근 1주일 기록
+     */
+    public Map<LocalDate, Map<String, AttendanceSessions>> findSessionsByUserIdAndDateBetween(Long userId, LocalDate date) {
+        // 최근 1주일
+        int week = 7;
+        LocalDate startDate = date.minusDays(week);
+        LocalDate endDate = date.plusDays(1);
+
+        List<String> timeSessionValues = TimeSession.getAllValues();
+        List<AttendanceSessions> existingSessions = attendanceSessionsRepository
+                .findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
+        List<LocalDate> dateRange = startDate.datesUntil(endDate).toList();
+
+        // 기존 데이터를 빠르게 조회할 수 있도록 Map 변환 (날짜 → (세션 값 → AttendanceSessions))
+        Map<LocalDate, Map<String, AttendanceSessions>> sessionMap = existingSessions.stream()
+                .collect(Collectors.groupingBy(
+                        AttendanceSessions::getDate, // 날짜별 그룹화
+                        Collectors.toMap(
+                                s -> s.getTimeSession().getSessionAsString(), // 세션 값을 Key로 저장
+                                s -> s,
+                                (oldValue, newValue) -> newValue // 중복 방지
+
+                        )
+                ));
+
+
+        // 모든 날짜 + 모든 세션을 포함하도록 보정
+        for (LocalDate currentDate : dateRange) {
+            sessionMap.putIfAbsent(currentDate, new HashMap<>()); // 날짜 없으면 기본 추가
+            Map<String, AttendanceSessions> sessionsForDate = sessionMap.get(currentDate);
+
+            for (String timeSessionValue : timeSessionValues) {
+                sessionsForDate.putIfAbsent(timeSessionValue, new AttendanceSessions(userId, currentDate.atStartOfDay(), 0, currentDate));
+            }
+        }
+
+        return sessionMap;
+    }
+
 
     /**
      * currentTime이 속한 블록의 마감 시각을 구하는 메서드
