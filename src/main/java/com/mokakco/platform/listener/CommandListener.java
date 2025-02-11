@@ -65,12 +65,9 @@ public class CommandListener extends ListenerAdapter {
         Integer attendanceMinute = attendanceService.findTodayAttendanceTime(userId);
         String message = "금일 출석 시간: " + convertMinutesToHoursAndMinutes(attendanceMinute);
 
-        if (event.getChannel().getId().equals(attendanceChannelId.toString())) {
-            event.reply(message).queue();
-            return;
-        }
+        boolean isEphemeralRequired = event.getChannel().getId().equals(attendanceChannelId.toString());
          // 출석 채널이 아닌 경우 본인만 확인 가능하도록 설정
-        event.reply(message).setEphemeral(true).queue();
+        event.reply(message).setEphemeral(!isEphemeralRequired).queue();
     }
 
     public String[][] convertAttendanceToMatrix(Map<LocalDate, Map<String, AttendanceSessions>> sessionMap) {
@@ -102,7 +99,8 @@ public class CommandListener extends ListenerAdapter {
 
 
     private void AttendanceSessionTime(SlashCommandInteractionEvent event) {
-        event.deferReply().queue();
+        boolean isEphemeralRequired = event.getChannel().getId().equals(attendanceChannelId.toString());
+        event.deferReply().setEphemeral(!isEphemeralRequired).queue();
         CompletableFuture.runAsync(() -> {
             try {
                 Member member = event.getMember();
@@ -124,8 +122,7 @@ public class CommandListener extends ListenerAdapter {
                 table.append("```");
 
                 // ✅ 출석 채널 여부에 따라 응답 방식 변경
-                boolean isAttendanceChannel = event.getChannel().getId().equals(attendanceChannelId.toString());
-                event.getHook().sendMessage(table.toString()).setEphemeral(!isAttendanceChannel).queue();
+                event.getHook().sendMessage(table.toString()).setEphemeral(!isEphemeralRequired).queue();
 
             } catch (Exception e) {
                 event.getHook().sendMessage("⚠️ 출석 기록을 불러오는 중 오류가 발생했습니다.").setEphemeral(true).queue();
