@@ -4,6 +4,8 @@ import com.mokakco.platform.configure.DiscordConfigure;
 import com.mokakco.platform.member.UserService;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +23,8 @@ public class AttendanceSchedule {
     private final AttendanceService attendanceService;
     private final UserService userService;
     private final Clock clock;
+
+    private static final Logger botLogger = LoggerFactory.getLogger("discordBotLogger");
 
 
     @Value("${ATTENDANCE_ENTRY_EXIT_CHANNEL_ID}")
@@ -44,6 +48,7 @@ public class AttendanceSchedule {
 
     public void autoSessionTransition() {
         VoiceChannel channel = discordConfigure.getVoiceChannel(attendanceEntryExitChannelId);
+        botLogger.info("스케줄링 시작: " + LocalDateTime.now(clock));
 
         if (channel == null) {
             throw new IllegalArgumentException("출석 채널을 찾을 수 없습니다.");
@@ -65,5 +70,7 @@ public class AttendanceSchedule {
                     );
             }
         }
+
+        botLogger.info("스케줄링 종료: " + LocalDateTime.now(clock));
     }
 }
